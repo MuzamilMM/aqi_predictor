@@ -1,51 +1,46 @@
 {
-  "best_model": "Lasso Regression",
-  "best_rmse": 1.678,
+  "best_model": "Ridge Regression",
+  "best_rmse": 0.936,
   "feature_cols": [
-    "pm10",
-    "co",
-    "no2",
-    "o3",
-    "so2",
+    "aqi_lag1",
+    "aqi_lag2",
+    "aqi_lag3",
+    "aqi_lag7",
+    "aqi_lag14",
+    "aqi_roll3",
+    "aqi_roll7",
+    "aqi_change_rate",
     "day_of_week",
     "month",
-    "is_weekend",
-    "pm25_lag1",
-    "pm25_lag2",
-    "pm25_lag3",
-    "pm25_lag7",
-    "pm25_lag14",
-    "pm25_roll3",
-    "pm25_roll7",
-    "pm25_change_rate"
+    "is_weekend"
   ],
-  "target": "pm25",
-  "train_rows": 393,
-  "test_rows": 99,
+  "target": "aqi",
+  "train_rows": 400,
+  "test_rows": 100,
   "summary": {
     "Ridge Regression": {
-      "RMSE": 3.372,
-      "MAE": 2.685,
-      "R2": 0.9334,
-      "CV_RMSE": 10.671
+      "RMSE": 0.936,
+      "MAE": 0.71,
+      "R2": 0.9972,
+      "CV_RMSE": 2.409
     },
     "Lasso Regression": {
-      "RMSE": 1.678,
-      "MAE": 1.263,
-      "R2": 0.9835,
-      "CV_RMSE": 9.806
+      "RMSE": 1.526,
+      "MAE": 1.253,
+      "R2": 0.9925,
+      "CV_RMSE": 1.891
     },
     "Random Forest": {
-      "RMSE": 3.657,
-      "MAE": 2.925,
-      "R2": 0.9216,
-      "CV_RMSE": 16.671
+      "RMSE": 3.98,
+      "MAE": 2.089,
+      "R2": 0.9491,
+      "CV_RMSE": 6.331
     },
     "Gradient Boosting": {
-      "RMSE": 3.49,
-      "MAE": 2.699,
-      "R2": 0.9286,
-      "CV_RMSE": 15.386
+      "RMSE": 3.247,
+      "MAE": 1.912,
+      "R2": 0.9661,
+      "CV_RMSE": 6.761
     }
   }
 }
