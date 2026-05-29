@@ -1,0 +1,80 @@
+# ============================================================
+#  training_pipeline.yml
+#  Runs train.py every day at midnight, saves updated models
+# ============================================================
+
+name: Training Pipeline (Daily)
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # runs every day at midnight (UTC)
+  workflow_dispatch:        # also lets you run it manually from GitHub UI
+
+jobs:
+  run-training-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Step 1: Download your code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Cache pip packages
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      # Step 4: Install all dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Step 5: Restore the most recent saved data
+      - name: Restore cached data
+        uses: actions/cache@v4
+        with:
+          path: data/
+          key: aqi-data-${{ github.run_id }}
+          restore-keys: aqi-data-
+
+      # Step 6: If no cached data, fetch fresh from AQICN
+      - name: Fetch data (if no cache)
+        env:
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
+        run: |
+          if [ ! -f data/karachi_historical.csv ]; then
+            echo "No cached data found, fetching fresh data..."
+            python fetch_data.py
+          else
+            echo "Using cached data"
+          fi
+
+      # Step 7: Build features
+      - name: Run feature engineering
+        run: python feature_pipeline.py
+
+      # Step 8: Train all 4 models and pick the best
+      - name: Train models
+        run: python train.py
+
+      # Step 9: Upload trained models as artifact (downloadable)
+      - name: Upload trained models
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-models-${{ github.run_number }}
+          path: models/
+          retention-days: 30   # keep models for 30 days
+
+      # Step 10: Show model performance in the GitHub Actions log
+      - name: Print model summary
+        run: |
+          echo "===== Model Performance Summary ====="
+          cat models/metadata.json

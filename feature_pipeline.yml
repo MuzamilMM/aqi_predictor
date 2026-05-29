@@ -1,0 +1,65 @@
+# ============================================================
+#  feature_pipeline.yml
+#  Runs fetch_data.py + feature_pipeline.py every hour
+#  GitHub Actions will do this automatically — no server needed
+# ============================================================
+
+name: Feature Pipeline (Hourly)
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # runs at minute 0 of every hour
+  workflow_dispatch:        # also lets you run it manually from GitHub UI
+
+jobs:
+  run-feature-pipeline:
+    runs-on: ubuntu-latest  # GitHub provides a free Linux machine
+
+    steps:
+
+      # Step 1: Download your code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Cache pip packages (speeds up future runs)
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      # Step 4: Install all dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Step 5: Restore previously saved data (so we don't lose history)
+      - name: Restore cached data
+        uses: actions/cache@v4
+        with:
+          path: data/
+          key: aqi-data-${{ github.run_id }}
+          restore-keys: aqi-data-
+
+      # Step 6: Fetch latest AQI data from AQICN
+      - name: Fetch latest data
+        env:
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}  # stored safely in GitHub Secrets
+        run: python fetch_data.py
+
+      # Step 7: Compute features and save to CSV
+      - name: Run feature engineering
+        run: python feature_pipeline.py
+
+      # Step 8: Upload updated data as an artifact (downloadable from GitHub)
+      - name: Upload feature data
+        uses: actions/upload-artifact@v4
+        with:
+          name: karachi-features-${{ github.run_number }}
+          path: data/
+          retention-days: 7   # keep for 7 days
