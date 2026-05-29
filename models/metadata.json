@@ -1,0 +1,51 @@
+{
+  "best_model": "Lasso Regression",
+  "best_rmse": 1.678,
+  "feature_cols": [
+    "pm10",
+    "co",
+    "no2",
+    "o3",
+    "so2",
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "pm25_lag1",
+    "pm25_lag2",
+    "pm25_lag3",
+    "pm25_lag7",
+    "pm25_lag14",
+    "pm25_roll3",
+    "pm25_roll7",
+    "pm25_change_rate"
+  ],
+  "target": "pm25",
+  "train_rows": 393,
+  "test_rows": 99,
+  "summary": {
+    "Ridge Regression": {
+      "RMSE": 3.372,
+      "MAE": 2.685,
+      "R2": 0.9334,
+      "CV_RMSE": 10.671
+    },
+    "Lasso Regression": {
+      "RMSE": 1.678,
+      "MAE": 1.263,
+      "R2": 0.9835,
+      "CV_RMSE": 9.806
+    },
+    "Random Forest": {
+      "RMSE": 3.657,
+      "MAE": 2.925,
+      "R2": 0.9216,
+      "CV_RMSE": 16.671
+    },
+    "Gradient Boosting": {
+      "RMSE": 3.49,
+      "MAE": 2.699,
+      "R2": 0.9286,
+      "CV_RMSE": 15.386
+    }
+  }
+}
