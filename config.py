@@ -8,9 +8,7 @@ HISTORICAL_START = "2025-01-01"
 DATA_DIR         = "data"
 HISTORICAL_CSV   = f"{DATA_DIR}/karachi_historical.csv"
 
-# Only use MongoDB if MONGO_URI is set as environment variable
-# Locally set this in your terminal: $env:MONGO_URI = "your_connection_string"
-MONGO_URI = os.environ.get("MONGO_URI", "")
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://msajjad29350_db_user:8HWuMjdWYqMp8nb7@cluster0.b44pod8.mongodb.net/?appName=Cluster0")
 MONGO_DB  = "aqi_predictor"
 RAW_COLLECTION      = "raw_data"
 FEATURES_COLLECTION = "features"

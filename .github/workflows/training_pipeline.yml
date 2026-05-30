@@ -22,6 +22,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Train models
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: python train.py
 
       - name: Upload trained models
