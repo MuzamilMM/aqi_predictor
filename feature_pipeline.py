@@ -21,7 +21,13 @@ def aqi_category(value):
 
 
 def get_collection():
-    client = MongoClient(MONGO_URI, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=30000)
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsCAFile=certifi.where(),
+        serverSelectionTimeoutMS=30000
+    )
+    client.admin.command("ping")
     return client[MONGO_DB][FEATURES_COLLECTION]
 
 
@@ -60,32 +66,40 @@ def build_features(df):
 
 
 def save_features(df):
-    collection = get_collection()
-    collection.drop()
-    records = df.to_dict("records")
-    for r in records:
-        r["datetime"] = str(r["datetime"])
-        r.pop("date", None)
-    collection.insert_many(records)
-    print(f"Saved {len(records)} feature rows to MongoDB")
+    try:
+        collection = get_collection()
+        collection.drop()
+        records = df.to_dict("records")
+        for r in records:
+            r["datetime"] = str(r["datetime"])
+            r.pop("date", None)
+        collection.insert_many(records)
+        print(f"Saved {len(records)} feature rows to MongoDB")
+    except Exception as e:
+        print(f"MongoDB save failed: {e}. Saving to CSV only.")
+        df.to_csv("data/karachi_features.csv", index=False)
 
 
 def load_features():
-    collection = get_collection()
-    records    = list(collection.find({}, {"_id": 0}))
-    df         = pd.DataFrame(records)
-    df["datetime"] = pd.to_datetime(df["datetime"])
-    print(f"Loaded {len(df)} rows from MongoDB")
-    return df.sort_values("datetime").reset_index(drop=True)
+    try:
+        collection = get_collection()
+        records    = list(collection.find({}, {"_id": 0}))
+        df         = pd.DataFrame(records)
+        df["datetime"] = pd.to_datetime(df["datetime"])
+        print(f"Loaded {len(df)} rows from MongoDB")
+        return df.sort_values("datetime").reset_index(drop=True)
+    except Exception as e:
+        print(f"MongoDB load failed: {e}. Using CSV fallback.")
+        df = pd.read_csv("data/karachi_features.csv", parse_dates=["datetime"])
+        print(f"Loaded {len(df)} rows from CSV")
+        return df.sort_values("datetime").reset_index(drop=True)
 
 
 if __name__ == "__main__":
     raw = pd.read_csv(HISTORICAL_CSV)
     print(f"Loaded {len(raw)} raw records")
-
     features_df = build_features(raw)
     save_features(features_df)
-
     print(f"\nShape: {features_df.shape}")
     print(f"\nCorrelation with AQI:")
     corr = features_df[FEATURE_COLS + [TARGET_COL]].corr()[TARGET_COL].drop(TARGET_COL)

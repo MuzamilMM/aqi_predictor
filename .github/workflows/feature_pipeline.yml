@@ -21,6 +21,30 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Debug MongoDB URI
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          python -c "
+import os
+uri = os.getenv('MONGO_URI')
+print('URI exists:', uri is not None)
+print('URI length:', len(uri) if uri else 0)
+print('Starts with mongodb+srv:', uri.startswith('mongodb+srv://') if uri else False)
+"
+
+      - name: Test MongoDB connection
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          python -c "
+from pymongo import MongoClient
+import certifi, os
+client = MongoClient(os.environ['MONGO_URI'], tls=True, tlsCAFile=certifi.where())
+print(client.admin.command('ping'))
+print('MongoDB connection successful!')
+"
+
       - name: Fetch latest data and build features
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
