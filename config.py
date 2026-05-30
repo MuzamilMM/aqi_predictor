@@ -4,12 +4,12 @@ CITY_NAME = "Karachi"
 LAT       = 24.8607
 LON       = 67.0011
 
-HISTORICAL_START = "2025-01-01"
-DATA_DIR         = "data"
-HISTORICAL_CSV   = f"{DATA_DIR}/karachi_historical.csv"
+HISTORICAL_START    = "2025-01-01"
+DATA_DIR            = "data"
+HISTORICAL_CSV      = f"{DATA_DIR}/karachi_historical.csv"
 
-MONGO_URI = os.environ.get("MONGO_URI", "")
-MONGO_DB  = "aqi_predictor"
+MONGO_URI           = os.environ["mongodb+srv://msajjad29350_db_user:kYoExAOXy95Z2GEP@cluster0.b44pod8.mongodb.net/?appName=Cluster0"]
+MONGO_DB            = "aqi_predictor"
 RAW_COLLECTION      = "raw_data"
 FEATURES_COLLECTION = "features"
 
