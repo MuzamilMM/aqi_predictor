@@ -19,14 +19,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install certifi
+        run: pip install -r requirements.txt
 
       - name: Train models
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
         run: python train.py
 
       - name: Upload trained models

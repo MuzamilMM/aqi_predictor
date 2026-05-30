@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import timedelta
 
 from config           import MODELS_DIR, HISTORICAL_CSV, FEATURE_COLS, FORECAST_DAYS
-from feature_pipeline import aqi_category, load_features_from_mongo
+from feature_pipeline import aqi_category, load_features
 
 
 def load_best_model():
@@ -44,7 +44,7 @@ def _build_feature_row(df, target_date):
 
 
 def forecast_next_days(model, days=FORECAST_DAYS):
-    df        = load_features_from_mongo()
+    df        = load_features()
     df        = df.sort_values("datetime").reset_index(drop=True)
     last_date = df["datetime"].iloc[-1]
 

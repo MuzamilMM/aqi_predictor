@@ -1,6 +1,8 @@
+import os
 import pandas as pd
-from pymongo import MongoClient
 from config import HISTORICAL_CSV, MONGO_URI, MONGO_DB, FEATURES_COLLECTION, FEATURE_COLS, TARGET_COL
+
+USE_MONGO = bool(MONGO_URI)
 
 
 def aqi_category(value):
@@ -19,13 +21,8 @@ def aqi_category(value):
 
 
 def get_collection():
-    client = MongoClient(
-        MONGO_URI,
-        tls=True,
-        tlsAllowInvalidCertificates=True,
-        tlsAllowInvalidHostnames=True,
-        serverSelectionTimeoutMS=30000,
-    )
+    from pymongo import MongoClient
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
     return client[MONGO_DB][FEATURES_COLLECTION]
 
 
@@ -63,22 +60,39 @@ def build_features(df):
     return daily
 
 
-def save_features_to_mongo(df):
-    collection = get_collection()
-    collection.drop()
-    records = df.to_dict("records")
-    for r in records:
-        r["datetime"] = str(r["datetime"])
-        r.pop("date", None)
-    collection.insert_many(records)
-    print(f"Saved {len(records)} feature rows to MongoDB")
+def save_features(df):
+    features_csv = "data/karachi_features.csv"
+    df.to_csv(features_csv, index=False)
+    print(f"Saved features to CSV: {features_csv}")
+
+    if USE_MONGO:
+        try:
+            collection = get_collection()
+            collection.drop()
+            records = df.to_dict("records")
+            for r in records:
+                r["datetime"] = str(r["datetime"])
+                r.pop("date", None)
+            collection.insert_many(records)
+            print(f"Saved {len(records)} feature rows to MongoDB")
+        except Exception as e:
+            print(f"MongoDB save failed: {e}. CSV saved successfully.")
 
 
-def load_features_from_mongo():
-    collection = get_collection()
-    records    = list(collection.find({}, {"_id": 0}))
-    df         = pd.DataFrame(records)
-    df["datetime"] = pd.to_datetime(df["datetime"])
+def load_features():
+    if USE_MONGO:
+        try:
+            collection = get_collection()
+            records    = list(collection.find({}, {"_id": 0}))
+            df         = pd.DataFrame(records)
+            df["datetime"] = pd.to_datetime(df["datetime"])
+            print(f"Loaded {len(df)} rows from MongoDB")
+            return df.sort_values("datetime").reset_index(drop=True)
+        except Exception as e:
+            print(f"MongoDB load failed: {e}. Using CSV fallback.")
+
+    df = pd.read_csv("data/karachi_features.csv", parse_dates=["datetime"])
+    print(f"Loaded {len(df)} rows from CSV")
     return df.sort_values("datetime").reset_index(drop=True)
 
 
@@ -87,7 +101,7 @@ if __name__ == "__main__":
     print(f"Loaded {len(raw)} raw records")
 
     features_df = build_features(raw)
-    save_features_to_mongo(features_df)
+    save_features(features_df)
 
     print(f"\nShape: {features_df.shape}")
     print(f"\nCorrelation with AQI:")

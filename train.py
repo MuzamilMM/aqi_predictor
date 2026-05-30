@@ -13,7 +13,7 @@ from sklearn.metrics          import mean_squared_error, mean_absolute_error, r2
 from sklearn.pipeline         import Pipeline
 
 from config           import MODELS_DIR, FEATURE_COLS, TARGET_COL, TEST_SIZE, RANDOM_STATE
-from feature_pipeline import load_features_from_mongo
+from feature_pipeline import load_features
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 
@@ -50,7 +50,7 @@ def evaluate(y_true, y_pred):
 
 
 def train_all():
-    df = load_features_from_mongo()
+    df = load_features()
     df = df.sort_values("datetime").dropna(subset=FEATURE_COLS + [TARGET_COL])
     print(f"Loaded {len(df)} rows from MongoDB")
 
