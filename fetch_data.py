@@ -10,7 +10,7 @@ URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 
 
 def get_collection():
-    client = MongoClient(MONGO_URI)
+    client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
     return client[MONGO_DB][RAW_COLLECTION]
 
 
