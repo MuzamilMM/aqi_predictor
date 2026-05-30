@@ -1,4 +1,4 @@
-import os, requests
+import os, ssl, requests
 import pandas as pd
 from datetime import datetime
 from pymongo import MongoClient
@@ -10,7 +10,13 @@ URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 
 
 def get_collection():
-    client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsAllowInvalidCertificates=True,
+        tlsAllowInvalidHostnames=True,
+        serverSelectionTimeoutMS=30000,
+    )
     return client[MONGO_DB][RAW_COLLECTION]
 
 

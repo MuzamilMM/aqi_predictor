@@ -19,7 +19,13 @@ def aqi_category(value):
 
 
 def get_collection():
-    client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsAllowInvalidCertificates=True,
+        tlsAllowInvalidHostnames=True,
+        serverSelectionTimeoutMS=30000,
+    )
     return client[MONGO_DB][FEATURES_COLLECTION]
 
 
