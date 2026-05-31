@@ -46,10 +46,10 @@ def _build_feature_row(df, target_date):
 def forecast_next_days(model, days=FORECAST_DAYS):
     df        = load_features()
     df        = df.sort_values("datetime").reset_index(drop=True)
-    last_date = df["datetime"].iloc[-1]
+    last_date = pd.Timestamp(df["datetime"].iloc[-1])
 
     forecasts = []
-    for step in range(1, days + 1):
+    for step in range(0, days):
         forecast_date = pd.Timestamp(last_date) + timedelta(days=step)
         fv            = _build_feature_row(df, forecast_date)
         X             = np.array([[fv[c] for c in FEATURE_COLS]])
