@@ -1,6 +1,6 @@
 {
   "best_model": "Ridge Regression",
-  "best_rmse": 0.936,
+  "best_rmse": 0.929,
   "feature_cols": [
     "aqi_lag1",
     "aqi_lag2",
@@ -15,32 +15,32 @@
     "is_weekend"
   ],
   "target": "aqi",
-  "train_rows": 400,
-  "test_rows": 100,
+  "train_rows": 402,
+  "test_rows": 101,
   "summary": {
     "Ridge Regression": {
-      "RMSE": 0.936,
-      "MAE": 0.71,
+      "RMSE": 0.929,
+      "MAE": 0.707,
       "R2": 0.9972,
-      "CV_RMSE": 2.409
+      "CV_RMSE": 2.391
     },
     "Lasso Regression": {
-      "RMSE": 1.526,
-      "MAE": 1.253,
-      "R2": 0.9925,
-      "CV_RMSE": 1.891
+      "RMSE": 1.538,
+      "MAE": 1.275,
+      "R2": 0.9924,
+      "CV_RMSE": 1.914
     },
     "Random Forest": {
-      "RMSE": 3.98,
-      "MAE": 2.089,
+      "RMSE": 3.978,
+      "MAE": 2.065,
       "R2": 0.9491,
-      "CV_RMSE": 6.331
+      "CV_RMSE": 6.66
     },
     "Gradient Boosting": {
-      "RMSE": 3.247,
-      "MAE": 1.912,
-      "R2": 0.9661,
-      "CV_RMSE": 6.761
+      "RMSE": 3.328,
+      "MAE": 1.867,
+      "R2": 0.9643,
+      "CV_RMSE": 6.732
     }
   }
 }
