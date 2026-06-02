@@ -38,16 +38,16 @@
       "CV_RMSE": 1.784
     },
     "Random Forest": {
-      "RMSE": 4.198,
-      "MAE": 2.366,
-      "R2": 0.9418,
-      "CV_RMSE": 8.0
+      "RMSE": 4.208,
+      "MAE": 2.368,
+      "R2": 0.9415,
+      "CV_RMSE": 8.003
     },
     "Gradient Boosting": {
-      "RMSE": 3.498,
-      "MAE": 1.905,
-      "R2": 0.9596,
-      "CV_RMSE": 7.488
+      "RMSE": 3.506,
+      "MAE": 1.908,
+      "R2": 0.9594,
+      "CV_RMSE": 7.482
     }
   }
 }
