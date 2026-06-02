@@ -1,8 +1,9 @@
 import os
+import numpy as np
 import pandas as pd
 from pymongo import MongoClient
 import certifi
-from config import HISTORICAL_CSV, MONGO_URI, MONGO_DB, FEATURES_COLLECTION, FEATURE_COLS, TARGET_COL
+from config import HISTORICAL_CSV, MONGO_URI, MONGO_DB, FEATURES_COLLECTION, FEATURE_COLS, TARGET_COL, WEATHER_COLS
 
 
 def aqi_category(value):
@@ -32,6 +33,8 @@ def get_collection():
 
 
 def build_features(df):
+    from fetch_data import fetch_historical_weather
+
     df = df.copy()
     df["datetime"] = pd.to_datetime(df["datetime"])
     df = df.sort_values("datetime").reset_index(drop=True)
@@ -43,9 +46,27 @@ def build_features(df):
 
     daily["aqi"] = daily["aqi"].ffill(limit=3)
 
+    # --- merge historical weather ---
+    try:
+        weather = fetch_historical_weather()
+        weather["date"] = pd.to_datetime(weather["date"]).dt.date
+        daily = daily.merge(weather, on="date", how="left")
+        for col in WEATHER_COLS:
+            daily[col] = daily[col].ffill(limit=3)
+        print("Historical weather merged successfully")
+    except Exception as e:
+        print(f"Weather fetch failed: {e}. Filling weather cols with 0.")
+        for col in WEATHER_COLS:
+            daily[col] = 0.0
+
     daily["day_of_week"] = daily["datetime"].dt.dayofweek
     daily["month"]       = daily["datetime"].dt.month
     daily["is_weekend"]  = (daily["day_of_week"] >= 5).astype(int)
+
+    # seasonal cyclical features
+    doy = daily["datetime"].dt.dayofyear
+    daily["day_of_year_sin"] = np.sin(2 * np.pi * doy / 365)
+    daily["day_of_year_cos"] = np.cos(2 * np.pi * doy / 365)
 
     daily["aqi_lag1"]  = daily["aqi"].shift(1)
     daily["aqi_lag2"]  = daily["aqi"].shift(2)
