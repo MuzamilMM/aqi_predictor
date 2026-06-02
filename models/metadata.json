@@ -1,6 +1,6 @@
 {
   "best_model": "Ridge Regression",
-  "best_rmse": 0.572,
+  "best_rmse": 0.921,
   "feature_cols": [
     "aqi_lag1",
     "aqi_lag2",
@@ -12,35 +12,42 @@
     "aqi_change_rate",
     "day_of_week",
     "month",
-    "is_weekend"
+    "is_weekend",
+    "day_of_year_sin",
+    "day_of_year_cos",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_10m",
+    "precipitation",
+    "surface_pressure"
   ],
   "target": "aqi",
-  "train_rows": 988,
-  "test_rows": 247,
+  "train_rows": 414,
+  "test_rows": 104,
   "summary": {
     "Ridge Regression": {
-      "RMSE": 0.572,
-      "MAE": 0.434,
-      "R2": 0.9994,
-      "CV_RMSE": 1.813
+      "RMSE": 0.921,
+      "MAE": 0.714,
+      "R2": 0.9972,
+      "CV_RMSE": 43.405
     },
     "Lasso Regression": {
-      "RMSE": 1.583,
-      "MAE": 1.193,
-      "R2": 0.9955,
-      "CV_RMSE": 1.218
+      "RMSE": 1.487,
+      "MAE": 1.23,
+      "R2": 0.9927,
+      "CV_RMSE": 1.784
     },
     "Random Forest": {
-      "RMSE": 3.089,
-      "MAE": 1.555,
-      "R2": 0.9827,
-      "CV_RMSE": 3.612
+      "RMSE": 4.157,
+      "MAE": 2.318,
+      "R2": 0.9429,
+      "CV_RMSE": 8.036
     },
     "Gradient Boosting": {
-      "RMSE": 2.716,
-      "MAE": 1.556,
-      "R2": 0.9866,
-      "CV_RMSE": 3.232
+      "RMSE": 3.489,
+      "MAE": 1.899,
+      "R2": 0.9598,
+      "CV_RMSE": 7.489
     }
   }
 }
