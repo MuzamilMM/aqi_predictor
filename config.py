@@ -4,7 +4,7 @@ CITY_NAME = "Karachi"
 LAT       = 24.8607
 LON       = 67.0011
 
-HISTORICAL_START    = "2025-01-01"
+HISTORICAL_START    = "2023-01-01"
 DATA_DIR            = "data"
 HISTORICAL_CSV      = f"{DATA_DIR}/karachi_historical.csv"
 
