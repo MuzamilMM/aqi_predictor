@@ -1,6 +1,8 @@
+import os
 import json
 import joblib
-import os
+import glob
+import traceback
 import numpy as np
 import pandas as pd
 from datetime import timedelta
@@ -10,17 +12,33 @@ from feature_pipeline import aqi_category, load_features
 
 
 def load_best_model():
-    return joblib.load(f"{MODELS_DIR}/best_model.pkl")
+    path = f"{MODELS_DIR}/best_model.pkl"
+    try:
+        return joblib.load(path)
+    except Exception as e:
+        print("\n!!! CRITICAL PICKLE ERROR LOADING BEST MODEL !!!")
+        print(f"Error Message: {str(e)}")
+        print("--- FULL ERROR TRACEBACK TO UNCOVER HIDDEN MODULE ---")
+        traceback.print_exc()
+        print("----------------------------------------------------\n")
+        raise e
 
 
 def load_all_models():
-    import glob
     models = {}
     for path in glob.glob(f"{MODELS_DIR}/*.pkl"):
         name = os.path.basename(path).replace(".pkl", "").replace("_", " ").title()
         if name == "Best Model":
             continue
-        models[name] = joblib.load(path)
+        try:
+            models[name] = joblib.load(path)
+        except Exception as e:
+            print(f"\n!!! CRITICAL PICKLE ERROR LOADING MODEL '{name}' !!!")
+            print(f"Error Message: {str(e)}")
+            print("--- FULL ERROR TRACEBACK TO UNCOVER HIDDEN MODULE ---")
+            traceback.print_exc()
+            print("----------------------------------------------------\n")
+            raise e
     return models
 
 
@@ -37,13 +55,11 @@ def _build_feature_row(df, target_date):
     day_of_year = target_date.timetuple().tm_yday
     
     return {
-    
         "aqi_lag1":        df["aqi"].iloc[-1],
         "aqi_lag2":        df["aqi"].iloc[-2] if len(df) > 1 else df["aqi"].iloc[-1],
         "aqi_lag3":        df["aqi"].iloc[-3] if len(df) > 2 else df["aqi"].iloc[-1],
         "aqi_lag7":        df["aqi"].iloc[-7] if len(df) > 6 else df["aqi"].iloc[-1],
         "aqi_lag14":       df["aqi"].iloc[-14] if len(df) > 13 else df["aqi"].iloc[-1],
-        
         
         "aqi_roll3":       df["aqi"].iloc[-3:].mean(),
         "aqi_roll7":       df["aqi"].iloc[-7:].mean(),
