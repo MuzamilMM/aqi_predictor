@@ -165,22 +165,25 @@ MongoDB URI stored as GitHub Actions Secret and Streamlit Cloud Secret — never
 
 ## 🚧 Challenges Faced and How They Were Solved
 
-### 1. Data Leakage (R² = 0.9997 — too perfect)
-When training on hourly data, the model's lag1 feature was "1 hour ago." Since consecutive hours barely change, the model learned to just copy the previous value rather than genuinely predict. This was discovered by noticing the suspiciously perfect R² of 0.9997. The fix was switching to daily aggregation — averaging 24 hourly readings into one daily value. Now lag1 means "yesterday's average," which is a genuine 24-hour prediction challenge. R² settled to a realistic 0.9972.
+### 1. Data Leakage (R² = 0.9997 — Too Perfect)
+* **The Problem:** Initially, I set up the pipeline to train on hourly data, which made the model's `lag1` feature look at "1 hour ago." Because air quality rarely changes drastically from one hour to the next, the model learned a shortcut: it just copied the previous hour's value instead of actually learning the underlying patterns. This resulted in a suspiciously perfect R² score of 0.9997.
+* **The Solution:** I fixed this by switching the feature pipeline to daily aggregation, averaging the 24 hourly readings into a single daily average. This changed `lag1` to mean "yesterday's average," turning it into a genuine 24-hour prediction challenge. After this change, the R² reduced slightly to a much more reliable 0.9972, which makes sense given that our large dataset size helps the model capture strong, genuine historical patterns.
 
 ### 2. Identical 3-Day Predictions
-All three forecast days were showing the same value (e.g., 93.9, 93.9, 93.9). The root cause was that only the day-of-week feature changed between days — and the model had learned that weekday barely affects AQI in Karachi. The fix was adding OpenMeteo's free 3-day weather forecast as input features. Now each day has different temperature, humidity, wind, and pressure values, making each prediction reflect real expected atmospheric conditions.
+* **The Problem:** In my first forecasting attempts, the predictions for all three forward days came out almost identical (e.g., 93.9, 93.9, 93.9). I discovered the root cause was that only the day-of-week feature was changing between day 1, day 2, and day 3. The model had rightly learned that the day of the week has very little correlation with Karachi's overall pollution, so it outputted a flat baseline.
+* **The Solution:** To make the forecasts dynamic, I integrated OpenMeteo’s free 3-day weather forecast directly into the prediction loop as input features. Now, because each day passes different forecasted values for temperature, humidity, wind speed, and pressure, the model successfully reflects changing atmospheric conditions for each specific day.
 
 ### 3. MongoDB SSL Error on GitHub Actions
-GitHub Actions runners could not connect to MongoDB Atlas because the cluster was in the Mumbai (ap-south-1) region while GitHub's servers run on AWS us-east-1. The SSL handshake failed silently with a TLS internal error. After trying multiple certificate fixes, the real solution was creating a new MongoDB cluster on Google Cloud us-east-1 — geographically aligned with GitHub's infrastructure. Also added 0.0.0.0/0 to MongoDB Network Access since GitHub runners use dynamic IPs.
+* **The Problem:** While testing the automation, my GitHub Actions runner consistently failed to connect to MongoDB Atlas, throwing a silent TLS/SSL handshake error. After a lot of troubleshooting, I realized the issue was geographical: my initial MongoDB cluster was hosted in the Mumbai region (ap-south-1), while GitHub’s automated runners operate out of AWS us-east-1, causing a network mismatch. 
+* **The Solution:** I resolved this by spinning up a brand new MongoDB cluster on Google Cloud in the us-east-1 region to physically align it with GitHub’s servers. I also added `0.0.0.0/0` to the MongoDB Network Access list since GitHub Actions uses dynamic IP addresses that change with every run.
 
 ### 4. Credentials Accidentally Committed to Code
-During development, the MongoDB connection string was hardcoded in config.py with the password visible. When pushed to GitHub, the security scanner immediately blocked the push. The password was rotated on MongoDB Atlas, the credential was removed from code history, and all secrets were moved to GitHub Actions Secrets and Streamlit Cloud Secrets. config.py now reads via `os.environ.get("MONGO_URI", "")` — safe empty fallback if not set.
+* **The Problem:** Early in development, I accidentally left my live MongoDB connection string—including the plaintext database password—hardcoded inside `config.py`. As soon as I pushed the code, GitHub's automated security scanner flags caught the exposure and blocked the push.
+* **The Solution:** I immediately rotated and changed the database password on MongoDB Atlas. Then, I cleaned out the hardcoded string from my local scripts and git history, moving all sensitive credentials over to GitHub Actions Secrets and Streamlit Cloud Secrets. The `config.py` file was updated to pull securely using `os.environ.get("MONGO_URI", "")`, ensuring safe, credential-free code.
 
-### 5. Data Source Selection
-AQICN and OpenWeather were the first choices but both require paid plans for historical data — discovered only after registering and testing. OpenMeteo was found as a completely free alternative providing historical AQI back to 2020 with no API key required. It also provides weather archive and forecast data through separate endpoints, making it a single-source solution for all data needs.
-
----
+### 5. Choosing the Right Data Source
+* **The Problem:** Finding a reliable data source was tricky. I initially spent time registering for platforms like AQICN and OpenWeather, only to discover deep into testing that their historical data access required expensive paid subscriptions. 
+* **The Solution:** While looking for options, I saw a discussion on Discord where another student mentioned using the OpenMeteo API. I decided to try it out and found it to be a perfect fit. It is completely free, does not require an API key, and lets me pull historical data all the way back to 2020. Because it provides both the Air Quality and Weather Forecast data through simple endpoints, it served as the perfect single-source solution for the entire pipeline.
 
 ## 📈 Dashboard Features
 
