@@ -247,9 +247,6 @@ streamlit run dashboard.py
 
 - Add XGBoost/LightGBM for potentially better performance
 - Show prediction confidence intervals instead of single-point estimates
-- Extend pipeline to Lahore and Islamabad
-- Add email/SMS alerts when hazardous AQI is forecast
-- Add EDA notebook with seasonal analysis
 
 ---
 
