@@ -46,6 +46,14 @@ OpenMeteo Air Quality API  +  OpenMeteo Weather Archive API
                 ↓
     predict.py → dashboard.py → Streamlit Cloud (public URL)
 ```
+## 📊 Exploratory Data Analysis & Feature Insights
+
+Because this project was developed as a modular, script-based production pipeline rather than an isolated Jupyter notebook, the Exploratory Data Analysis (EDA) phase was integrated directly into the system architecture and live dashboard:
+
+* **Trend Identification & Seasonality:** During initial data exploration, strong annual pollution cycles and daily variations were identified. To capture these trends mathematically without overfitting, cyclical sine/cosine encodings (`day_of_year_sin`, `day_of_year_cos`) and specific monthly/weekend calendar features were engineered into the pipeline.
+* **Feature Correlations:** Deep analysis of historical data revealed that yesterday's air quality has the highest correlation with today's conditions. This insight drove the creation of the autoregressive lag features (`aqi_lag1` through `aqi_lag14`) and rolling averages to capture short-term atmospheric momentum.
+* **Post-Model Explainability (SHAP):** Instead of static offline EDA plots, **SHAP (SHapley Additive exPlanations)** is utilized to dynamically interpret how features impact predictions. This allows us to see exactly how weather variations and rolling trends affect Karachi's AQI values across different seasons.
+* **Live Visualizations:** Actual-vs-predicted validation curves (for the last 60 days) and long-term historical AQI trends from January 2023 to the present day are served interactively on the live Streamlit dashboard for continuous analytical tracking.
 
 ---
 
