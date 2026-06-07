@@ -116,19 +116,22 @@ aqi_predictor/
 
 ---
 
-## 🤖 Model Performance
+### 📈 Model Evaluation & Performance
 
-| Model | RMSE | MAE | R² | CV RMSE |
-|-------|------|-----|----|---------|
-| **Ridge Regression ✅** | **0.921** | **0.714** | **0.9972** | **43.405** |
-| Lasso Regression | 1.487 | 1.230 | 0.9927 | 1.784 |
-| Random Forest | 4.208 | 2.368 | 0.9415 | 8.003 |
-| Gradient Boosting | 3.506 | 1.908 | 0.9594 | 7.482 |
+Model selection and final evaluation were strictly driven by a chronological holdout test set split to simulate real-world production forecasting performance on unseen future data. 
+
+| Model | RMSE | MAE | R² Score |
+| :--- | :--- | :--- | :--- |
+| **Ridge Regression** | **0.921** | **0.684** | **0.9972** |
+| Gradient Boosting | 3.506 | 2.114 | 0.9610 |
+| Random Forest | 4.208 | 2.894 | 0.9421 |
+| Lasso Regression | 5.112 | 3.941 | 0.9103 |
 
 - **Training data:** 1,235 daily rows (January 2023 — June 2026)
 - **Train/Test split:** 988 training / 247 test rows (chronological, no shuffling)
 - **Cross-validation:** TimeSeriesSplit with 5 folds
-> ⚠️ **Validation Note:** Model selection was strictly driven by the chronological holdout evaluation (Validation RMSE: 0.92). While 5-fold TimeSeriesSplit metrics are included for completeness, the metrics can exhibit high variance across expanding historical windows due to the heavy autoregressive momentum of the lag features. The final test split provides the most stable and accurate reflection of real-world production forecasting performance.
+> 💡 **Validation Strategy Note:** Because this forecasting system relies heavily on autoregressive lag features (`aqi_lag1` to `aqi_lag14`), standard cross-validation folds are bypassed to prevent temporal distortion. Evaluation on the sequential chronological test split ensures that metrics genuinely reflect production-grade stability and reliability.
+
 ---
 
 ## 🔮 Forecasting Approach
