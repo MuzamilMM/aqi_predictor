@@ -20,10 +20,11 @@ An end-to-end machine learning pipeline that predicts Karachi's Air Quality Inde
 
 ---
 
-## 🎯 Why This Project
+## 🎯 Project Choice & Goal
 
-Karachi is one of the most polluted cities in the world. AQI regularly crosses 200–300 in winters, classified as Very Unhealthy to Hazardous. Yet there is no free, reliable 3-day AQI forecast for Karachi. This project fills that gap — giving residents, schools, and healthcare providers advance warning to take preventive action.
+This repository contains the project I developed during my data science internship in the Shine Program at 10Pearls. 
 
+The goal was to build a complete, production-ready machine learning system from scratch that targets a real-world problem. I chose to focus on Karachi's air quality because we were asked to predict the AQI of the city we live in.
 ---
 
 ## 🏗️ System Architecture
