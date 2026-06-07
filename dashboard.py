@@ -49,20 +49,15 @@ def sidebar():
         ["Best (auto)", "Ridge Regression", "Lasso Regression", "Random Forest", "Gradient Boosting"])
     show_all        = st.sidebar.checkbox("Compare all models", value=False)
     show_validation = st.sidebar.checkbox("Show model validation", value=True)
-    show_shap = st.sidebar.checkbox("Show SHAP analysis", value=False)
+    show_shap       = st.sidebar.checkbox("Show SHAP analysis", value=False)
     refresh         = st.sidebar.button("🔄 Refresh")
     st.sidebar.markdown("---")
     st.sidebar.markdown(f"**City:** {CITY_NAME}")
     st.sidebar.markdown(f"**Source:** OpenMeteo API")
     st.sidebar.markdown(f"**Last updated:** {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    return model_choice, show_all, show_validation, refresh
+    return model_choice, show_all, show_validation, show_shap, refresh
 
-if show_shap:
-    st.subheader("🔍 SHAP Feature Importance")
-    st.image("models/shap_importance.png", caption="Feature Importance")
-    st.image("models/shap_summary.png", caption="SHAP Summary")
-    st.markdown("---")
-    
+
 def gauge(value):
     label, color = aqi_category(value)
     fig = go.Figure(go.Indicator(
@@ -164,11 +159,20 @@ def comparison_chart(all_forecasts):
 
 
 def main():
-    model_choice, show_all, show_validation, refresh = sidebar()
+    model_choice, show_all, show_validation, show_shap, refresh = sidebar()
 
     st.title(f"🌫️ AQI Forecaster — {CITY_NAME}")
     st.markdown("**3-day Air Quality Index prediction for Karachi**")
     st.markdown("---")
+
+    if show_shap:
+        st.subheader("🔍 SHAP Feature Importance")
+        c_shap1, c_shap2 = st.columns(2)
+        with c_shap1:
+            st.image("models/shap_importance.png", caption="Feature Importance")
+        with c_shap2:
+            st.image("models/shap_summary.png", caption="SHAP Summary")
+        st.markdown("---")
 
     history = load_history()
     best_model, all_models, meta = load_model_meta()
@@ -188,12 +192,10 @@ def main():
     forecasts     = forecast_next_days(selected_model)
     all_forecasts = forecast_all_models() if show_all else {}
 
-    # Current AQI
     latest      = history.sort_values("datetime").iloc[-1]
     current_aqi = live["aqi"] if live else latest["aqi"]
     label, _    = aqi_category(current_aqi)
 
-    # Alert
     alert = get_alert(current_aqi)
     if alert["is_hazard"]:
         st.error(f"{alert['emoji']} **HAZARDOUS — AQI {round(current_aqi)}** | {alert['action']}")
@@ -202,20 +204,17 @@ def main():
     else:
         st.success(f"{alert['emoji']} **{label} — AQI {round(current_aqi)}** | {alert['action']}")
 
-    # Forecast alerts
     for a in check_forecast_alerts(forecasts):
         st.warning(f"{a['emoji']} **{a['day']} ({a['date']})** — Forecast AQI {a['aqi']} ({a['label']})")
 
     st.markdown("---")
 
-    # Gauge + Forecast
     c1, c2 = st.columns([1, 2])
     with c1:
         st.plotly_chart(gauge(current_aqi), use_container_width=True)
     with c2:
         st.plotly_chart(forecast_chart(forecasts, f"3-Day Forecast [{selected_name}]"), use_container_width=True)
 
-    # Forecast cards
     st.subheader("📅 3-Day Forecast")
     cols = st.columns(3)
     for i, fc in enumerate(forecasts):
@@ -232,7 +231,6 @@ def main():
 
     st.markdown("---")
 
-    
     if show_validation:
         st.subheader("✅ Model Validation — Actual vs Predicted (Last 60 Days)")
         fig_val, mae, rmse = validation_chart(selected_model)
@@ -243,13 +241,10 @@ def main():
         v3.metric("R²",   meta["summary"][selected_name]["R2"])
         st.markdown("---")
 
-
     st.plotly_chart(historical_chart(history), use_container_width=True)
-
 
     if show_all and all_forecasts:
         st.plotly_chart(comparison_chart(all_forecasts), use_container_width=True)
-
 
     st.subheader("📊 Model Performance")
     rows = [{"Model": n, "RMSE": m["RMSE"], "MAE": m["MAE"],
