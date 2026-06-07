@@ -49,6 +49,7 @@ def sidebar():
         ["Best (auto)", "Ridge Regression", "Lasso Regression", "Random Forest", "Gradient Boosting"])
     show_all        = st.sidebar.checkbox("Compare all models", value=False)
     show_validation = st.sidebar.checkbox("Show model validation", value=True)
+    show_shap = st.sidebar.checkbox("Show SHAP analysis", value=False)
     refresh         = st.sidebar.button("🔄 Refresh")
     st.sidebar.markdown("---")
     st.sidebar.markdown(f"**City:** {CITY_NAME}")
@@ -56,7 +57,12 @@ def sidebar():
     st.sidebar.markdown(f"**Last updated:** {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     return model_choice, show_all, show_validation, refresh
 
-
+if show_shap:
+    st.subheader("🔍 SHAP Feature Importance")
+    st.image("models/shap_importance.png", caption="Feature Importance")
+    st.image("models/shap_summary.png", caption="SHAP Summary")
+    st.markdown("---")
+    
 def gauge(value):
     label, color = aqi_category(value)
     fig = go.Figure(go.Indicator(
@@ -226,7 +232,7 @@ def main():
 
     st.markdown("---")
 
-    # Validation
+    
     if show_validation:
         st.subheader("✅ Model Validation — Actual vs Predicted (Last 60 Days)")
         fig_val, mae, rmse = validation_chart(selected_model)
@@ -237,14 +243,14 @@ def main():
         v3.metric("R²",   meta["summary"][selected_name]["R2"])
         st.markdown("---")
 
-    # Historical
+
     st.plotly_chart(historical_chart(history), use_container_width=True)
 
-    # All models comparison
+
     if show_all and all_forecasts:
         st.plotly_chart(comparison_chart(all_forecasts), use_container_width=True)
 
-    # Model metrics
+
     st.subheader("📊 Model Performance")
     rows = [{"Model": n, "RMSE": m["RMSE"], "MAE": m["MAE"],
              "R²": m["R2"], "CV RMSE": m["CV_RMSE"],
