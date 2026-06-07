@@ -141,10 +141,10 @@ Recursive multi-step prediction:
 2. Day+1 prediction becomes lag1 for Day+2
 3. Day+2 prediction becomes lag1 for Day+3
 
-Each day uses its own weather forecast — producing genuinely different predictions per day.
+Each day uses its own weather forecast — producing different predictions per day.
 
 **Before weather features:** 93.9, 93.9, 93.9 (identical — not useful)
-**After weather features:** 92.9, 93.8, 94.1 (different — reflects real atmospheric conditions)
+**After weather features:** 92.9, 93.8, 94.1 (different — Useful)
 
 ---
 
