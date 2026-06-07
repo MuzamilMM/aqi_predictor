@@ -111,15 +111,14 @@ aqi_predictor/
 
 | Model | RMSE | MAE | R² | CV RMSE |
 |-------|------|-----|----|---------|
-| **Ridge Regression ✅** | **0.921** | **0.714** | **0.9972** | **43.4** |
+| **Ridge Regression ✅** | **0.921** | **0.714** | **0.9972** | **43.405** |
 | Lasso Regression | 1.487 | 1.230 | 0.9927 | 1.784 |
 | Random Forest | 4.208 | 2.368 | 0.9415 | 8.003 |
-| Gradient Boosting | — | — | — | — |
+| Gradient Boosting | 3.506 | 1.908 | 0.9594 | 7.482 |
 
 - **Training data:** 1,235 daily rows (January 2023 — June 2026)
 - **Train/Test split:** 988 training / 247 test rows (chronological, no shuffling)
 - **Cross-validation:** TimeSeriesSplit with 5 folds
-
 ---
 
 ## 🔮 Forecasting Approach
