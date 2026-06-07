@@ -128,6 +128,7 @@ aqi_predictor/
 - **Training data:** 1,235 daily rows (January 2023 — June 2026)
 - **Train/Test split:** 988 training / 247 test rows (chronological, no shuffling)
 - **Cross-validation:** TimeSeriesSplit with 5 folds
+> ⚠️ **Note on Cross-Validation:** Standard K-Fold CV metrics are included for transparency but are highly unstable because random data splits break the time-series order of lag features (`aqi_lag1` to `aqi_lag14`). Therefore, model selection was strictly based on the sequential chronological validation RMSE (0.92), which accurately reflects real-world production performance.
 ---
 
 ## 🔮 Forecasting Approach
