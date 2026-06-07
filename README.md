@@ -230,19 +230,14 @@ MongoDB URI stored as GitHub Actions Secret and Streamlit Cloud Secret — never
 ## 🛠️ Local Setup
 
 ```bash
-# 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Set MongoDB URI (required)
 $env:MONGO_URI = "your_mongodb_connection_string"
 
-# 3. Run full pipeline
 python fetch_data.py
 python feature_pipeline.py
 python train.py
 python predict.py
-
-# 4. Launch dashboard
 streamlit run dashboard.py
 ```
 
